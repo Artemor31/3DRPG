@@ -65,10 +65,11 @@
   <ItemGroup>
     <Compile Include="Assets\Script\Combat\CombatTarget.cs" />
     <Compile Include="Assets\Script\Combat\Fighter.cs" />
-    <Compile Include="Assets\Script\Combat\Health.cs" />
+    <Compile Include="Assets\Script\Control\AICotroller.cs" />
     <Compile Include="Assets\Script\Control\PlayerController.cs" />
     <Compile Include="Assets\Script\Core\ActionScheduler.cs" />
     <Compile Include="Assets\Script\Core\FollowCamera.cs" />
+    <Compile Include="Assets\Script\Core\Health.cs" />
     <Compile Include="Assets\Script\Core\IAction.cs" />
     <Compile Include="Assets\Script\Movenment\Mover.cs" />
     <None Include="Assets\Stuff\Asset Packs\Synty - Polygon Student Sample\README - Usage Rights for these assets.txt" />
