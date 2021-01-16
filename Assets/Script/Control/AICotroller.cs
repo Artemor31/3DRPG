@@ -5,6 +5,7 @@ using UnityEngine.AI;
 using RPG.Combat;
 using RPG.Core;
 using RPG.Movement;
+using System;
 
 namespace RPG.Control
 {
@@ -12,6 +13,14 @@ namespace RPG.Control
     {
         [SerializeField] float _chaseDistance = 5f;
         [SerializeField] float _suspiciousTime = 5f;
+        [SerializeField] float _waypointStaytime = 2f;
+        [Range(0,1)]
+        [SerializeField] float _patrolSpeedFraction = 0.2f;
+        [SerializeField] PathControl _pathControl = null;
+
+        int _waypointIndex = 0;
+        float _distanceToWaypoint = 0.5f;
+
 
         GameObject _player;
         Fighter _fighter;
@@ -19,6 +28,7 @@ namespace RPG.Control
         Mover _mover;
         Vector3 _startPosition;
         float _timeSincelastPlayerSaw = Mathf.Infinity;
+        float _timeSinceLastWaypointArrived = Mathf.Infinity;
 
 
         private void Start()
@@ -47,16 +57,44 @@ namespace RPG.Control
             }
             else
             {
-                GuardBehaviour();
+                PatrolBehaviour();
             }
 
-
+            _timeSinceLastWaypointArrived += Time.deltaTime;
             _timeSincelastPlayerSaw += Time.deltaTime;
         }
 
-        private void GuardBehaviour()
+        private void PatrolBehaviour()
         {
-            _mover.StartMove(_startPosition);
+            Vector3 nextPosition = _startPosition;
+            if (_pathControl != null)
+            {
+                if(AtWaypoint())
+                {
+                    CycleWaypoint();
+                }
+                nextPosition = GetNextWaypoint();
+            }
+
+            if (_timeSinceLastWaypointArrived < _waypointStaytime) return;
+
+            _timeSinceLastWaypointArrived = 0;
+            _mover.StartMove(nextPosition, _patrolSpeedFraction);
+        }
+
+        private Vector3 GetNextWaypoint()
+        {
+            return _pathControl.GetCurrentWaypoint(_waypointIndex);
+        }
+
+        private void CycleWaypoint()
+        {
+            _waypointIndex = _pathControl.GetNextWaypointIndex(_waypointIndex);
+        }
+
+        private bool AtWaypoint()
+        {
+            return Vector3.Distance(transform.position, GetNextWaypoint()) < _distanceToWaypoint;
         }
 
         private void AggroBehaviour()

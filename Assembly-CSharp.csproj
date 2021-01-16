@@ -65,14 +65,22 @@
   <ItemGroup>
     <Compile Include="Assets\Script\Combat\CombatTarget.cs" />
     <Compile Include="Assets\Script\Combat\Fighter.cs" />
+    <Compile Include="Assets\Script\Combat\Pickups.cs" />
+    <Compile Include="Assets\Script\Combat\Projectile.cs" />
+    <Compile Include="Assets\Script\Combat\Weapon.cs" />
     <Compile Include="Assets\Script\Control\AICotroller.cs" />
+    <Compile Include="Assets\Script\Control\PathControl.cs" />
     <Compile Include="Assets\Script\Control\PlayerController.cs" />
     <Compile Include="Assets\Script\Core\ActionScheduler.cs" />
     <Compile Include="Assets\Script\Core\FollowCamera.cs" />
     <Compile Include="Assets\Script\Core\Health.cs" />
     <Compile Include="Assets\Script\Core\IAction.cs" />
     <Compile Include="Assets\Script\Movenment\Mover.cs" />
+    <Compile Include="Assets\Script\SceneManagment\Fader.cs" />
+    <Compile Include="Assets\Script\SceneManagment\PersistObjects.cs" />
+    <Compile Include="Assets\Script\SceneManagment\Portal.cs" />
     <None Include="Assets\Stuff\Asset Packs\Synty - Polygon Student Sample\README - Usage Rights for these assets.txt" />
+    <None Include="Assets\Asset Packs\SimpleFX\Materials\UnlitVertexColour_Alpha.shader" />
     <None Include="Assets\Asset Packs\Animations by Explosive\README - Usage Rights for these assets 1.txt" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/UnityEditorFolder/2019.4.13f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
@@ -605,6 +613,9 @@
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/UnityProjects/3DRPG_OpenWorld/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Cinemachine">
+      <HintPath>C:/UnityProjects/3DRPG_OpenWorld/Library/ScriptAssemblies/Cinemachine.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>C:/UnityProjects/3DRPG_OpenWorld/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
@@ -622,6 +633,9 @@
     </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>C:/UnityProjects/3DRPG_OpenWorld/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>C:/UnityProjects/3DRPG_OpenWorld/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:/UnityProjects/3DRPG_OpenWorld/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>

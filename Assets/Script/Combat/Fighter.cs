@@ -6,18 +6,20 @@ namespace RPG.Combat
 {
     class Fighter : MonoBehaviour, IAction
     {
-        [SerializeField] float _range = 2f;
-        [SerializeField] float _attackDelay = 1f;
-        [SerializeField] float Damage = 10f;
+        [SerializeField] Transform _leftHandTransform = null;
+        [SerializeField] Transform _rightHandTransform = null;
+        [SerializeField] Weapon _defaultWeapon = null;
 
         float _timeSInceLastAttack = Mathf.Infinity;
 
         Health _target;
         Mover _mover;
+        Weapon _currentWeapon = null;
 
         private void Start()
         {
             _mover = GetComponent<Mover>();
+            EquipWeapon(_defaultWeapon);
         }
 
         private void Update()
@@ -29,7 +31,7 @@ namespace RPG.Combat
 
             if (!EnemyInRange())
             {
-                _mover.MoveTo(_target.GetComponent<Transform>().position);
+                _mover.MoveTo(_target.GetComponent<Transform>().position, 1);
             }
             else
             {
@@ -41,7 +43,7 @@ namespace RPG.Combat
         private void AttackBehavior()
         {
             transform.LookAt(_target.transform);
-            if (_timeSInceLastAttack > _attackDelay)
+            if (_timeSInceLastAttack > _defaultWeapon.GetDelay())
             {
                 GetComponent<Animator>().ResetTrigger("stopAttack");
                 GetComponent<Animator>().SetTrigger("attack");
@@ -51,7 +53,7 @@ namespace RPG.Combat
 
         private bool EnemyInRange()
         {
-            return Vector3.Distance(transform.position, _target.GetComponent<Transform>().position) < _range;
+            return Vector3.Distance(transform.position, _target.GetComponent<Transform>().position) < _currentWeapon.GetRange();
         }
 
         public void Attack(GameObject CombatTarget)
@@ -59,10 +61,10 @@ namespace RPG.Combat
             GetComponent<ActionScheduler>().StartAction(this);
             _target = CombatTarget.GetComponent<Health>();
         }
+
         // IAction
         public void Cancel()
         {
-            GetComponent<Animator>().ResetTrigger("attack");
             GetComponent<Animator>().SetTrigger("stopAttack");
             _target = null;
         }
@@ -75,12 +77,34 @@ namespace RPG.Combat
 
             return _Htarget != null && !_Htarget.Dead();
         }
-        //animator event
+
+        public void EquipWeapon(Weapon weapon)
+        {
+            _currentWeapon = weapon;
+            Animator animator = GetComponent<Animator>();
+            _currentWeapon.Spawn(_rightHandTransform, _leftHandTransform, animator);
+        }
+
+        //animator melee event
         void Hit()
         {
-            if(_target != null)
-            _target.TakeDamage(Damage);
+            if (_target == null) return; 
+
+            if (_currentWeapon.hasProjectile())
+            {
+                _currentWeapon.CreateProjectile(_rightHandTransform, _leftHandTransform, _target);                
+            }
+            else
+            {
+                _target.TakeDamage(_currentWeapon.GetDamage());
+            }
+
             GetComponent<Animator>().SetTrigger("stopAttack");
+        }
+        //animator bow event
+        void Shoot()
+        {
+            Hit();
         }
     }
 }
