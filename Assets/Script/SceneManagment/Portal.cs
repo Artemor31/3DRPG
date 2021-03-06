@@ -5,12 +5,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.AI;
 using RPG.Control;
+using RPG.Saving;
+using UnityEngine.Serialization;
 
 namespace RPG.SceneManagment
 {
     public class Portal : MonoBehaviour
     {
-        enum TransitionDestination
+        private enum TransitionDestination
         {
             North,
             South,
@@ -18,11 +20,11 @@ namespace RPG.SceneManagment
             East
         }
         
-        [SerializeField] int _loadingScene = -1;
-        [SerializeField] public Transform _spawnPoint;
-        [SerializeField] TransitionDestination transportDestination = TransitionDestination.North;
-        [SerializeField] float FadeOutTime = 1f;
-        [SerializeField] float FadeInTime = 1f;
+        [FormerlySerializedAs("_loadingScene")] [SerializeField] private int loadingScene = -1;
+        [FormerlySerializedAs("_spawnPoint")] [SerializeField] public Transform spawnPoint;
+        [SerializeField] private TransitionDestination transportDestination = TransitionDestination.North;
+        [FormerlySerializedAs("FadeOutTime")] [SerializeField] private float fadeOutTime = 1f;
+        [FormerlySerializedAs("FadeInTime")] [SerializeField] private float fadeInTime = 1f;
 
 
         private void OnTriggerEnter(Collider other)
@@ -38,18 +40,25 @@ namespace RPG.SceneManagment
             DontDestroyOnLoad(gameObject);
 
             Fader fader = FindObjectOfType<Fader>();
+            yield return fader.FadeOut(fadeOutTime);
 
-            yield return fader.FadeOut(FadeOutTime);
-            yield return SceneManager.LoadSceneAsync(_loadingScene);
+
+            SavingWrapper wrapper = FindObjectOfType<SavingWrapper>();
+            wrapper.Save();
+            yield return SceneManager.LoadSceneAsync(loadingScene);
+            wrapper.Load();
+
 
             GameObject player = GameObject.FindWithTag("Player");
             player.GetComponent<PlayerController>().enabled = false;
 
+
             Portal otherPortal = GetOtherPortal();
             UpdatePlayerPosition(player, otherPortal);
+            wrapper.Save();
 
             yield return new WaitForSeconds(0.5f);
-            yield return fader.FadeIn(FadeInTime);
+            yield return fader.FadeIn(fadeInTime);
 
             player.GetComponent<PlayerController>().enabled = true;
 
@@ -60,8 +69,8 @@ namespace RPG.SceneManagment
         {
             if (otherPortal != null)
             {
-                player.GetComponent<NavMeshAgent>().Warp(otherPortal._spawnPoint.position);
-                player.transform.rotation = otherPortal._spawnPoint.rotation;
+                player.GetComponent<NavMeshAgent>().Warp(otherPortal.spawnPoint.position);
+                player.transform.rotation = otherPortal.spawnPoint.rotation;
             }
         }
 

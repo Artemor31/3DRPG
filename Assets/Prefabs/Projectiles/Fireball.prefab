@@ -4860,6 +4860,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 10
   isHomingMissle: 0
+  _impactEffect: {fileID: 2302457091093092515, guid: 69d1b1037536b504884c93bb73d662db,
+    type: 3}
 --- !u!65 &3136134757296468010
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4894,7 +4896,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 479346, guid: 5cd5599e01f32bd418f20a3b9eac1c57, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.665
+      value: -0.195
       objectReference: {fileID: 0}
     - target: {fileID: 479346, guid: 5cd5599e01f32bd418f20a3b9eac1c57, type: 3}
       propertyPath: m_LocalRotation.x

@@ -6,29 +6,33 @@ using RPG.Combat;
 using RPG.Core;
 using RPG.Movement;
 using System;
+using RPG.Resources;
+using UnityEngine.Serialization;
 
 namespace RPG.Control
 {
     public class AICotroller : MonoBehaviour
     {
-        [SerializeField] float _chaseDistance = 5f;
-        [SerializeField] float _suspiciousTime = 5f;
-        [SerializeField] float _waypointStaytime = 2f;
+        [FormerlySerializedAs("_chaseDistance")] [SerializeField] private float chaseDistance = 5f;
+        [FormerlySerializedAs("_suspiciousTime")] [SerializeField] private float suspiciousTime = 5f;
+        [FormerlySerializedAs("_waypointStaytime")] [SerializeField] private float waypointStaytime = 2f;
+        [FormerlySerializedAs("_patrolSpeedFraction")]
         [Range(0,1)]
-        [SerializeField] float _patrolSpeedFraction = 0.2f;
-        [SerializeField] PathControl _pathControl = null;
+        [SerializeField]
+        private float patrolSpeedFraction = 0.2f;
+        [FormerlySerializedAs("_pathControl")] [SerializeField] private PathControl pathControl = null;
 
-        int _waypointIndex = 0;
-        float _distanceToWaypoint = 0.5f;
+        private int _waypointIndex = 0;
+        private float _distanceToWaypoint = 0.5f;
 
 
-        GameObject _player;
-        Fighter _fighter;
-        Health _health;
-        Mover _mover;
-        Vector3 _startPosition;
-        float _timeSincelastPlayerSaw = Mathf.Infinity;
-        float _timeSinceLastWaypointArrived = Mathf.Infinity;
+        private GameObject _player;
+        private Fighter _fighter;
+        private Health _health;
+        private Mover _mover;
+        private Vector3 _startPosition;
+        private float _timeSincelastPlayerSaw = Mathf.Infinity;
+        private float _timeSinceLastWaypointArrived = Mathf.Infinity;
 
 
         private void Start()
@@ -51,7 +55,7 @@ namespace RPG.Control
                 _timeSincelastPlayerSaw = 0;
                 AggroBehaviour();
             }
-            else if(_timeSincelastPlayerSaw < _suspiciousTime)
+            else if(_timeSincelastPlayerSaw < suspiciousTime)
             {
                 SuspiciousBehaviour();
             }
@@ -67,7 +71,7 @@ namespace RPG.Control
         private void PatrolBehaviour()
         {
             Vector3 nextPosition = _startPosition;
-            if (_pathControl != null)
+            if (pathControl != null)
             {
                 if(AtWaypoint())
                 {
@@ -76,20 +80,20 @@ namespace RPG.Control
                 nextPosition = GetNextWaypoint();
             }
 
-            if (_timeSinceLastWaypointArrived < _waypointStaytime) return;
+            if (_timeSinceLastWaypointArrived < waypointStaytime) return;
 
             _timeSinceLastWaypointArrived = 0;
-            _mover.StartMove(nextPosition, _patrolSpeedFraction);
+            _mover.StartMove(nextPosition, patrolSpeedFraction);
         }
 
         private Vector3 GetNextWaypoint()
         {
-            return _pathControl.GetCurrentWaypoint(_waypointIndex);
+            return pathControl.GetCurrentWaypoint(_waypointIndex);
         }
 
         private void CycleWaypoint()
         {
-            _waypointIndex = _pathControl.GetNextWaypointIndex(_waypointIndex);
+            _waypointIndex = pathControl.GetNextWaypointIndex(_waypointIndex);
         }
 
         private bool AtWaypoint()
@@ -105,17 +109,17 @@ namespace RPG.Control
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.Lerp(Color.red, Color.green, 0.3f);
-            Gizmos.DrawWireSphere(transform.position, _chaseDistance);
+            Gizmos.DrawWireSphere(transform.position, chaseDistance);
         }
 
-        void SuspiciousBehaviour()
+        private void SuspiciousBehaviour()
         {
             GetComponent<ActionScheduler>().CancelCurrentAction();
 
         }
         private bool DistanceToPlayer()
         {
-            return Vector3.Distance(_player.transform.position, transform.position) < _chaseDistance;
+            return Vector3.Distance(_player.transform.position, transform.position) < chaseDistance;
         }
     }
 }

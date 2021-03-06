@@ -1,32 +1,36 @@
-﻿using RPG.Core;
-using UnityEngine;
+﻿using UnityEngine;
+using RPG.Resources;
+using UnityEngine.Serialization;
 
 namespace RPG.Combat
 {
     public class Projectile : MonoBehaviour
     {
-        [SerializeField] float _speed = 5f;
-        [SerializeField] bool isHomingMissle;
+        [FormerlySerializedAs("_speed")] [SerializeField] private float speed = 5f;
+        [SerializeField] private bool isHomingMissle = false;
+        [FormerlySerializedAs("_impactEffect")] [SerializeField] private GameObject impactEffect = null;
+        [FormerlySerializedAs("_lifeTime")] [SerializeField] private float lifeTime = 6f;
 
-        Health _target = null;
+        private Health _target = null;
 
-        float _damage = 0;
+        private float _damage = 0;
+        private GameObject _shooter;
 
         private void Start()
         {
             if (!isHomingMissle) gameObject.transform.LookAt(GetAimPosition());
         }
 
-        void Update()
+        private void Update()
         {
             if (isHomingMissle && !_target.Dead()) gameObject.transform.LookAt(GetAimPosition());
 
             if (transform.position == _target.transform.position) return;
 
-            transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
         }
 
-        Vector3 GetAimPosition()
+        private Vector3 GetAimPosition()
         {
             CapsuleCollider capsuleCollider = _target.GetComponent<CapsuleCollider>();
 
@@ -36,10 +40,12 @@ namespace RPG.Combat
             return _target.transform.position + capsuleCollider.center;
         }
 
-        public void SetTarget(Health target, float damage)
+        public void SetTarget(GameObject shooter, Health target, float damage)
         {
             _target = target;
             _damage = damage;
+            _shooter = shooter;
+            Destroy(gameObject, lifeTime);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -48,7 +54,11 @@ namespace RPG.Combat
 
             if (_target.Dead()) return;
             
-            other.GetComponent<Health>().TakeDamage(_damage);
+            other.GetComponent<Health>().TakeDamage(_shooter,_damage);
+
+            if (impactEffect != null)
+                Instantiate(impactEffect, GetAimPosition(), transform.rotation);
+
             Destroy(gameObject);
         }
     }

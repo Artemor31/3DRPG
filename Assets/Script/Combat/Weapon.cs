@@ -1,44 +1,45 @@
-﻿using RPG.Core;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RPG.Resources;
+using UnityEngine.Serialization;
 
 namespace RPG.Combat
 {
     [CreateAssetMenu(fileName = "Weapon", menuName = "Weapons/New Weapon", order = 0)]
     public class Weapon : ScriptableObject
     {
-        const string WEAPON_NAME = "PickedWeapon";
+        private const string WeaponName = "PickedWeapon";
 
-        [SerializeField] float _damage = 10f;
-        [SerializeField] float _range = 2f;
-        [SerializeField] float _attackDelay = 1f;
-        [SerializeField] bool isRightHanded = true;
+        [SerializeField] private float damage = 10f;
+        [SerializeField] private float range = 2f;
+        [SerializeField] private float attackDelay = 1f;
+        [SerializeField] private bool isRightHanded = true;
 
-        [SerializeField] GameObject _weaponPrefab = null;
-        [SerializeField] AnimatorOverrideController _overridedAnimator = null;
-        [SerializeField] Projectile _projectile = null;
+        [SerializeField] private GameObject weaponPrefab = null;
+        [SerializeField] private AnimatorOverrideController overridedAnimator = null;
+        [SerializeField] private Projectile projectile = null;
 
 
         public void Spawn(Transform rightHand, Transform lefthand, Animator animator)
         {
             DestrouOldWeapon(rightHand, lefthand);
 
-            if (_weaponPrefab != null)
+            if (weaponPrefab != null)
             {
-                GameObject weapon = Instantiate(_weaponPrefab, GetSpawnTransform(rightHand, lefthand));
-                weapon.name = WEAPON_NAME;
+                GameObject weapon = Instantiate(weaponPrefab, GetSpawnTransform(rightHand, lefthand));
+                weapon.name = WeaponName;
             }
-            if (_overridedAnimator != null)
-                animator.runtimeAnimatorController = _overridedAnimator;
+            if (overridedAnimator != null)
+                animator.runtimeAnimatorController = overridedAnimator;
         }
 
-        void DestrouOldWeapon(Transform rightHand, Transform leftHand)
+        private void DestrouOldWeapon(Transform rightHand, Transform leftHand)
         {
-            Transform oldWeapon = rightHand.Find(WEAPON_NAME);
+            Transform oldWeapon = rightHand.Find(WeaponName);
             if (oldWeapon == null)
             {
-                oldWeapon = leftHand.Find(WEAPON_NAME);
+                oldWeapon = leftHand.Find(WeaponName);
             }
             if (oldWeapon == null) return;
             oldWeapon.name = "destroy";
@@ -53,27 +54,27 @@ namespace RPG.Combat
             return hand;
         }
 
-        public void CreateProjectile(Transform rightHand, Transform lefthand, Health target)
+        public void CreateProjectile(Transform rightHand, Transform lefthand, Health target, GameObject shooter, float damageBonus)
         {
-            Projectile projectile = Instantiate(_projectile, GetSpawnTransform(rightHand, lefthand).position, Quaternion.identity);
-            projectile.SetTarget(target, _damage);
+            Projectile projectile = Instantiate(this.projectile, GetSpawnTransform(rightHand, lefthand).position, Quaternion.identity);
+            projectile.SetTarget(shooter, target, damage * damageBonus);
         }
 
         public float GetDamage()
         {
-            return _damage;
+            return damage;
         }
         public float GetRange()
         {
-            return _range;
+            return range;
         }
         public float GetDelay()
         {
-            return _attackDelay;
+            return attackDelay;
         }
-        public bool hasProjectile()
+        public bool HasProjectile()
         {
-            return _projectile != null;
+            return projectile != null;
         }
     }
 }

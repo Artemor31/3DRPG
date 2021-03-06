@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace RPG.Core
 {
     public class FollowCamera : MonoBehaviour
     {
-        public Transform _target;
+        [FormerlySerializedAs("_target")] public Transform target;
 
-        void Update()
+        private void Update()
         {
-            transform.position = _target.position;
+            transform.position = target.position;
         }
     }
 }

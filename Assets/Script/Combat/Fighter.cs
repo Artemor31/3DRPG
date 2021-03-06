@@ -1,25 +1,31 @@
 ﻿using UnityEngine;
 using RPG.Movement;
 using RPG.Core;
+using RPG.Saving;
+using RPG.Resources;
+using UnityEngine.Serialization;
+using RPG.Stats;
 
 namespace RPG.Combat
 {
-    class Fighter : MonoBehaviour, IAction
+    internal class Fighter : MonoBehaviour, IAction, ISaveable
     {
-        [SerializeField] Transform _leftHandTransform = null;
-        [SerializeField] Transform _rightHandTransform = null;
-        [SerializeField] Weapon _defaultWeapon = null;
+        [FormerlySerializedAs("_leftHandTransform")] [SerializeField] private Transform leftHandTransform = null;
+        [FormerlySerializedAs("_rightHandTransform")] [SerializeField] private Transform rightHandTransform = null;
+        [FormerlySerializedAs("_defaultWeapon")] [SerializeField] private Weapon defaultWeapon = null;
 
-        float _timeSInceLastAttack = Mathf.Infinity;
+        private float _timeSInceLastAttack = Mathf.Infinity;
 
-        Health _target;
-        Mover _mover;
-        Weapon _currentWeapon = null;
+        private Health _target;
+        private Mover _mover;
+        private Weapon _currentWeapon = null;
 
         private void Start()
         {
             _mover = GetComponent<Mover>();
-            EquipWeapon(_defaultWeapon);
+
+           // if (_currentWeapon == null)
+                EquipWeapon(defaultWeapon);
         }
 
         private void Update()
@@ -43,7 +49,7 @@ namespace RPG.Combat
         private void AttackBehavior()
         {
             transform.LookAt(_target.transform);
-            if (_timeSInceLastAttack > _defaultWeapon.GetDelay())
+            if (_timeSInceLastAttack > _currentWeapon.GetDelay())
             {
                 GetComponent<Animator>().ResetTrigger("stopAttack");
                 GetComponent<Animator>().SetTrigger("attack");
@@ -56,10 +62,10 @@ namespace RPG.Combat
             return Vector3.Distance(transform.position, _target.GetComponent<Transform>().position) < _currentWeapon.GetRange();
         }
 
-        public void Attack(GameObject CombatTarget)
+        public void Attack(GameObject combatTarget)
         {
             GetComponent<ActionScheduler>().StartAction(this);
-            _target = CombatTarget.GetComponent<Health>();
+            _target = combatTarget.GetComponent<Health>();
         }
 
         // IAction
@@ -69,42 +75,66 @@ namespace RPG.Combat
             _target = null;
         }
 
-        public bool CanAttack(GameObject _cTarget)
+        public bool CanAttack(GameObject cTarget)
         {
-            if (_cTarget == null) return false;
+            if (cTarget == null) return false;
 
-            Health _Htarget = _cTarget.GetComponent<Health>();
+            Health htarget = cTarget.GetComponent<Health>();
 
-            return _Htarget != null && !_Htarget.Dead();
+            return htarget != null && !htarget.Dead();
         }
 
+        public Health GetCurrentTarget()
+        {
+            return _target;
+        }
         public void EquipWeapon(Weapon weapon)
         {
             _currentWeapon = weapon;
             Animator animator = GetComponent<Animator>();
-            _currentWeapon.Spawn(_rightHandTransform, _leftHandTransform, animator);
+            _currentWeapon.Spawn(rightHandTransform, leftHandTransform, animator);
         }
 
         //animator melee event
-        void Hit()
+        private void Hit()
         {
-            if (_target == null) return; 
+            if (_target == null) return;
 
-            if (_currentWeapon.hasProjectile())
+            float damageBonus = GetComponent<BaseStats>().GetStat(Progression.Stat.bonusDamage);
+
+            if (_currentWeapon.HasProjectile())
             {
-                _currentWeapon.CreateProjectile(_rightHandTransform, _leftHandTransform, _target);                
+                _currentWeapon.CreateProjectile(rightHandTransform, leftHandTransform, _target, gameObject, damageBonus);                
             }
             else
             {
-                _target.TakeDamage(_currentWeapon.GetDamage());
+                _target.TakeDamage(gameObject, _currentWeapon.GetDamage() * damageBonus);
             }
 
             GetComponent<Animator>().SetTrigger("stopAttack");
         }
         //animator bow event
-        void Shoot()
+        private void Shoot()
         {
             Hit();
+        }
+
+        public object CaptureState()
+        {
+            if (_currentWeapon != null)
+                return _currentWeapon.name;
+            else
+            {
+                string s = "Unarmed";
+                return s;
+            }
+        }
+
+        public void RestoreState(object state)
+        {
+            string weaponName = (string)state;
+            Weapon weapon =  UnityEngine.Resources.Load<Weapon>(weaponName);
+            EquipWeapon(weapon);
         }
     }
 }

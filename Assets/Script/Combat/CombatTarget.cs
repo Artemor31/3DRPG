@@ -1,10 +1,10 @@
-﻿using RPG.Core;
-using UnityEngine;
+﻿using UnityEngine;
+using RPG.Resources;
 
 namespace RPG.Combat
 {
     [RequireComponent(typeof(Health))]
-    class CombatTarget : MonoBehaviour
+    internal class CombatTarget : MonoBehaviour
     {
 
     }

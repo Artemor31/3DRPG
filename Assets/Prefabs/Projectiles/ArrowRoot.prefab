@@ -158,7 +158,7 @@ GameObject:
   - component: {fileID: 4681128519367783813}
   - component: {fileID: 3136134757296468010}
   m_Layer: 0
-  m_Name: ArrowWhite
+  m_Name: ArrowRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -194,6 +194,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 10
   isHomingMissle: 0
+  _impactEffect: {fileID: 7116447965045786374, guid: 365370078d23dff42b29c67d1d7bd8a7,
+    type: 3}
 --- !u!65 &3136134757296468010
 BoxCollider:
   m_ObjectHideFlags: 0

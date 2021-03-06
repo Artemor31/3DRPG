@@ -6,26 +6,30 @@ namespace RPG.SceneManagment
 {
     public class Fader : MonoBehaviour
     {
-        CanvasGroup canvasGroup;
+        private CanvasGroup _canvasGroup;
 
         private void Start()
         {
-            canvasGroup = GetComponent<CanvasGroup>();
+            _canvasGroup = GetComponent<CanvasGroup>();
         }
 
+        public void FadeOutFast()
+        {
+            _canvasGroup.alpha = 1;
+        }
         public IEnumerator FadeOut(float time)
         {
-            while (canvasGroup.alpha < 1)
+            while (_canvasGroup.alpha < 1)
             {
-                canvasGroup.alpha += Time.deltaTime / time;
+                _canvasGroup.alpha += Time.deltaTime / time;
                 yield return null;
             }
         }
         public IEnumerator FadeIn(float time)
         {
-            while (canvasGroup.alpha > 0)
+            while (_canvasGroup.alpha > 0)
             {
-                canvasGroup.alpha -= Time.deltaTime / time;
+                _canvasGroup.alpha -= Time.deltaTime / time;
                 yield return null;
             }
         }

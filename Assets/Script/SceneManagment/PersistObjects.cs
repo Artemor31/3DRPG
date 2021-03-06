@@ -2,32 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace RPG.SceneManagment
 {
     public class PersistObjects : MonoBehaviour
     {
-        [SerializeField] GameObject _persistObjects = null;
+        [FormerlySerializedAs("_persistObjects")] [SerializeField] private GameObject persistObjects = null;
 
-        static bool isSpawned =  false;
+        private static bool _isSpawned =  false;
 
         private void Awake()
         {
-            if (isSpawned) return;
+            if (_isSpawned) return;
             SpawnPersistObjects();
-            isSpawned = true;
+            _isSpawned = true;
 
         }
 
         private void SpawnPersistObjects()
         {
-            GameObject persistObjects = Instantiate(_persistObjects);
+            GameObject persistObjects = Instantiate(this.persistObjects);
             DontDestroyOnLoad(persistObjects);
-        }
-
-        void Update()
-        {
-
         }
     }
 }

@@ -1,18 +1,19 @@
 ﻿using RPG.Combat;
-using RPG.Core;
 using RPG.Movement;
 using UnityEngine;
+using RPG.Resources;
 
 namespace RPG.Control
 {
     public class PlayerController : MonoBehaviour
     {
-        Health _health;
+        private Health _health;
         private void Start()
         {
             _health = GetComponent<Health>();
         }
-        void Update()
+
+        private void Update()
         {
             if ( _health.Dead() ) return;
             if ( InteractWithCombat() ) return;
